@@ -61,3 +61,8 @@ async def audit_text(payload: dict):
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
     return audit_document(text)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=False)
