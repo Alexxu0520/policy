@@ -10,7 +10,7 @@
   <main class="container">
     <section class="hero">
       <h1>中国企业政策审核 RAG 系统</h1>
-      <p>工作流程：政策 JSON 数据 → 文本切分 → 向量嵌入 → ChromaDB 向量数据库 → 上传文档 → 检索相关政策 → Qwen 审核</p>
+      <p>工作流程：政策 JSON → 中文分句切块 → BGE 向量编码 + BM25 索引 → 上传文档 → Qwen 查询扩展 → BM25 + BGE 混合检索 → RRF 融合 → BGE Reranker + LambdaMART 精排 → Qwen2.5-3B 生成审核报告</p>
     </section>
 
     <section class="card">
