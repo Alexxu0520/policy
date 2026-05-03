@@ -1,0 +1,14 @@
+body { margin: 0; font-family: Arial, "Microsoft YaHei", sans-serif; background: #f6f7fb; color: #172033; }
+.container { max-width: 1100px; margin: 0 auto; padding: 32px; }
+.hero { margin-bottom: 24px; }
+.hero h1 { font-size: 32px; margin-bottom: 8px; }
+.card { background: white; border-radius: 16px; padding: 22px; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+button { background: #172033; color: white; border: none; border-radius: 10px; padding: 10px 16px; cursor: pointer; margin-left: 8px; }
+button:hover { opacity: .9; }
+input, textarea { width: 100%; box-sizing: border-box; margin-top: 8px; margin-bottom: 12px; }
+textarea { min-height: 140px; padding: 12px; border-radius: 10px; border: 1px solid #d8dce8; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+pre { white-space: pre-wrap; line-height: 1.5; }
+.chunk { border: 1px solid #e3e7f0; border-radius: 12px; padding: 12px; margin-bottom: 12px; background: #fafbff; }
+.meta { font-size: 13px; color: #5a6478; margin-bottom: 8px; }
+@media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }

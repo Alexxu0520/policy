@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>基于 Qwen 的政策 RAG 审核系统</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>中国企业政策审核 RAG 系统</h1>
+      <p>工作流程：政策 JSON 数据 → 文本切分 → 向量嵌入 → ChromaDB 向量数据库 → 上传文档 → 检索相关政策 → Qwen 审核</p>
+    </section>
+
+    <section class="card">
+      <h2>上传审核文件</h2>
+      <input id="fileInput" type="file" accept=".txt,.pdf,.doc,.docx" />
+      <button id="auditBtn">开始审核</button>
+      <p id="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>或直接输入文本</h2>
+      <textarea id="textInput" placeholder="例如：本文档包含客户手机号、身份证号、API Key，并计划发送给外部供应商……"></textarea>
+      <button id="auditTextBtn">审核文本</button>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>审核结果</h2>
+        <pre id="answer">等待审核...</pre>
+      </div>
+      <div class="card">
+        <h2>命中的政策依据</h2>
+        <div id="chunks"></div>
+      </div>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
