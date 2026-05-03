@@ -231,6 +231,7 @@ def lambdamart_rerank(query: str, chunks: List[RetrievedChunk], top_n: int = 5) 
     if model is None or not chunks:
         return chunks[:top_n]
     import numpy as np
+    _sev = {"high": 1.0, "medium": 0.5}
     X = np.array([
         [
             c.bm25_score or 0.0,
@@ -238,6 +239,7 @@ def lambdamart_rerank(query: str, chunks: List[RetrievedChunk], top_n: int = 5) 
             c.reranker_score or 0.0,
             len(query) / 500.0,
             len(c.text) / 400.0,
+            _sev.get(c.metadata.get("severity", "medium"), 0.5),
         ]
         for c in chunks
     ])
