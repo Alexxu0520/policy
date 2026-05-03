@@ -28,6 +28,7 @@ body {
   font-size: 14px;
   line-height: 1.6;
 }
+.hidden { display: none !important; }
 
 /* ── Navbar ────────────────────────────────────────────────────────── */
 .navbar {
@@ -70,15 +71,17 @@ body {
   background: var(--navy-light);
   border-bottom: 1px solid rgba(255,255,255,.08);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .pipeline-inner {
-  max-width: 1280px;
-  margin: 0 auto;
+  /* No max-width here — let content define the width so flex doesn't wrap */
   padding: 14px 28px;
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
-  min-width: max-content;
+  width: max-content;
+  min-width: 100%;
 }
 .pipe-node {
   text-align: center;
@@ -87,7 +90,10 @@ body {
   background: rgba(255,255,255,.06);
   border: 1px solid rgba(255,255,255,.1);
   min-width: 96px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
+.pipe-arrow { color: #475569; font-size: 20px; flex-shrink: 0; }
 .pipe-node.pipe-highlight {
   background: rgba(37,99,235,.25);
   border-color: rgba(37,99,235,.5);
@@ -97,8 +103,8 @@ body {
   border-color: rgba(22,163,74,.4);
 }
 .pipe-icon  { font-size: 18px; margin-bottom: 2px; }
-.pipe-label { color: #e2e8f0; font-size: 12px; font-weight: 600; }
-.pipe-sub   { color: #94a3b8; font-size: 10px; margin-top: 2px; }
+.pipe-label { color: #e2e8f0; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.pipe-sub   { color: #94a3b8; font-size: 10px; margin-top: 2px; white-space: nowrap; }
 .pipe-arrow { color: #475569; font-size: 20px; flex-shrink: 0; }
 
 /* ── Page layout ───────────────────────────────────────────────────── */
@@ -169,7 +175,14 @@ body {
   border-color: var(--blue);
   background: var(--blue-light);
 }
-.drop-zone input { display: none; }
+/* Hide native file input robustly across all browsers */
+.drop-zone input[type="file"] {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
 .drop-icon { font-size: 36px; margin-bottom: 10px; }
 .drop-title { font-size: 14px; font-weight: 500; color: var(--text); }
 .drop-hint  { font-size: 12px; color: var(--muted); margin-top: 4px; }
