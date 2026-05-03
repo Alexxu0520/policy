@@ -3,177 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>企业合规智能审核平台</title>
+  <title>基于 Qwen 的政策 RAG 审核系统</title>
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
+  <main class="container">
+    <section class="hero">
+      <h1>中国企业政策审核 RAG 系统</h1>
+      <p>工作流程：政策 JSON 数据 → 文本切分 → 向量嵌入 → ChromaDB 向量数据库 → 上传文档 → 检索相关政策 → Qwen 审核</p>
+    </section>
 
-<!-- ── Navbar ── -->
-<nav class="navbar">
-  <div class="navbar-inner">
-    <div class="navbar-brand">
-      <div class="brand-logo">⚖</div>
-      <div>
-        <div class="brand-name">企业合规智能审核平台</div>
-        <div class="brand-sub">Enterprise Compliance AI Platform</div>
-      </div>
-    </div>
-    <div class="navbar-right">
-      <span class="model-pill">Qwen2.5-3B · BGE · BM25 · LambdaMART</span>
-    </div>
-  </div>
-</nav>
+    <section class="card">
+      <h2>上传审核文件</h2>
+      <input id="fileInput" type="file" accept=".txt,.pdf,.doc,.docx" />
+      <button id="auditBtn">开始审核</button>
+      <p id="status"></p>
+    </section>
 
-<!-- ── Pipeline banner ── -->
-<div class="pipeline-bar">
-  <div class="pipeline-inner">
-    <div class="pipe-node">
-      <div class="pipe-icon">📋</div>
-      <div class="pipe-label">政策知识库</div>
-      <div class="pipe-sub">30 条合规政策</div>
-    </div>
-    <div class="pipe-arrow">›</div>
-    <div class="pipe-node">
-      <div class="pipe-icon">✂</div>
-      <div class="pipe-label">中文分句切块</div>
-      <div class="pipe-sub">语义边界切分</div>
-    </div>
-    <div class="pipe-arrow">›</div>
-    <div class="pipe-node pipe-highlight">
-      <div class="pipe-icon">⚡</div>
-      <div class="pipe-label">双路索引</div>
-      <div class="pipe-sub">BGE 向量 + BM25</div>
-    </div>
-    <div class="pipe-arrow">›</div>
-    <div class="pipe-node">
-      <div class="pipe-icon">🔍</div>
-      <div class="pipe-label">查询扩展</div>
-      <div class="pipe-sub">Qwen 子查询生成</div>
-    </div>
-    <div class="pipe-arrow">›</div>
-    <div class="pipe-node">
-      <div class="pipe-icon">⚗</div>
-      <div class="pipe-label">RRF 融合</div>
-      <div class="pipe-sub">混合检索排序</div>
-    </div>
-    <div class="pipe-arrow">›</div>
-    <div class="pipe-node pipe-highlight">
-      <div class="pipe-icon">🎯</div>
-      <div class="pipe-label">双阶段精排</div>
-      <div class="pipe-sub">BGE Reranker + LambdaMART</div>
-    </div>
-    <div class="pipe-arrow">›</div>
-    <div class="pipe-node pipe-final">
-      <div class="pipe-icon">📊</div>
-      <div class="pipe-label">审核报告</div>
-      <div class="pipe-sub">Qwen2.5-3B 生成</div>
-    </div>
-  </div>
-</div>
+    <section class="card">
+      <h2>或直接输入文本</h2>
+      <textarea id="textInput" placeholder="例如：本文档包含客户手机号、身份证号、API Key，并计划发送给外部供应商……"></textarea>
+      <button id="auditTextBtn">审核文本</button>
+    </section>
 
-<!-- ── Main ── -->
-<main class="page">
-
-  <!-- Input card -->
-  <div class="card input-card">
-    <div class="card-header">
-      <h2>文档合规审核</h2>
-      <p class="card-sub">上传文件或直接粘贴文本，系统将自动检索匹配政策并生成结构化审核报告</p>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="file">📎&nbsp; 上传文件</button>
-      <button class="tab" data-tab="text">📝&nbsp; 输入文本</button>
-    </div>
-
-    <!-- File tab -->
-    <div class="tab-pane" id="tab-file">
-      <label class="drop-zone" id="dropZone">
-        <div class="drop-icon">📄</div>
-        <p class="drop-title">拖放文件至此，或点击选择</p>
-        <p class="drop-hint">支持 .txt · .pdf · .doc · .docx</p>
-        <input id="fileInput" type="file" accept=".txt,.pdf,.doc,.docx" />
-      </label>
-      <div id="fileChosen" class="file-chosen" style="display:none">
-        <span class="file-icon">📄</span>
-        <span id="fileName"></span>
-        <button class="btn-clear" id="clearFile">×</button>
-      </div>
-      <button class="btn-primary" id="auditBtn" disabled>开始审核</button>
-    </div>
-
-    <!-- Text tab -->
-    <div class="tab-pane hidden" id="tab-text">
-      <textarea id="textInput" placeholder="请输入待审核文档内容，例如：&#10;本文档包含客户手机号、身份证号，计划共享给外部供应商。系统日志未开启，数据库密码为 admin123……"></textarea>
-      <button class="btn-primary" id="auditTextBtn">开始审核</button>
-    </div>
-
-    <!-- Status bar -->
-    <div class="status-bar" id="statusBar" style="display:none">
-      <span class="spinner"></span>
-      <span id="statusText">审核中，首次加载模型可能需要较久…</span>
-    </div>
-  </div>
-
-  <!-- Results (hidden until first audit) -->
-  <div id="resultsWrap" style="display:none">
-
-    <!-- Risk header -->
-    <div class="risk-banner" id="riskBanner">
-      <div class="risk-left">
-        <div class="risk-badge" id="riskBadge">—</div>
-        <div>
-          <div class="risk-title">综合风险等级</div>
-          <div class="risk-file" id="riskFile"></div>
-        </div>
-      </div>
-      <div class="risk-meta" id="riskMeta"></div>
-    </div>
-
-    <!-- Two-column results -->
-    <div class="results-grid">
-
-      <!-- Left: Audit report -->
+    <section class="grid">
       <div class="card">
-        <div class="card-header">
-          <h3>审核报告</h3>
-        </div>
-        <div id="auditSections"></div>
+        <h2>审核结果</h2>
+        <pre id="answer">等待审核...</pre>
       </div>
-
-      <!-- Right: Evidence + sub-queries -->
-      <div class="right-col">
-
-        <div class="card" id="subQueryCard" style="display:none">
-          <div class="card-header">
-            <h3>查询扩展 <span class="chip">Query Expansion</span></h3>
-            <p class="card-sub">Qwen 基于文档自动生成的合规子查询</p>
-          </div>
-          <ol id="subQueries" class="sub-query-list"></ol>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h3>命中政策依据 <span class="chip">Top-5</span></h3>
-            <p class="card-sub">BM25 + BGE 混合检索 → BGE Reranker → LambdaMART 精排</p>
-          </div>
-          <div id="chunks"></div>
-        </div>
-
+      <div class="card">
+        <h2>命中的政策依据</h2>
+        <div id="chunks"></div>
       </div>
-    </div>
-  </div>
-
-</main>
-
-<!-- ── Footer ── -->
-<footer class="footer">
-  <div class="footer-inner">
-    <span>企业合规智能审核平台 · 仅供内部合规审核使用</span>
-    <span class="footer-stack">BGE-large-zh-v1.5 · BM25 · RRF · LambdaMART · Qwen2.5-3B · ChromaDB · FastAPI</span>
-  </div>
-</footer>
-
-<script src="/static/app.js"></script>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
 </body>
 </html>
